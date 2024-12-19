@@ -1,5 +1,8 @@
 from setting import *
 from player import Player
+from sprites import *
+
+from random import randint
 
 class Game():
     def __init__(self):
@@ -12,21 +15,30 @@ class Game():
 
         #Groups
         self.all_sprites = pygame.sprite.Group()
+        self.collision_sprites = pygame.sprite.Group()
 
         #Sprites
-        self.player = Player((WINDOW_WIDTH/2,WINDOW_HIEGHT/2),self.all_sprites)
+        self.player = Player((WINDOW_WIDTH/2,WINDOW_HIEGHT/2),self.all_sprites,self.collision_sprites)
+        for i in range(6):
+            w,h = randint(60,100),randint(50,100)
+            x,y = randint(0,WINDOW_WIDTH),randint(0,WINDOW_HIEGHT)
+            CollisionsSprites((x,y),(w,h),(self.all_sprites,self.collision_sprites))
 
     
     def start_game(self):
         while self.running:
             dt = self.clock.tick() / 1000
+
+            #Event Loop
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     self.running = False
 
+            #Update
             self.all_sprites.update(dt)
 
-            self.surface.fill('red')
+            #Draw
+            self.surface.fill('black')
             self.all_sprites.draw(self.surface)
             pygame.display.update()
             
