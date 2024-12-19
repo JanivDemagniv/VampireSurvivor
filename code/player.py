@@ -27,8 +27,8 @@ class Player(pygame.sprite.Sprite):
 
     def input(self):
         keys = pygame.key.get_pressed()
-        self.dir.x = int(keys[pygame.K_RIGHT]) - int(keys[pygame.K_LEFT])
-        self.dir.y = int(keys[pygame.K_DOWN]) - int(keys[pygame.K_UP])
+        self.dir.x = int(keys[pygame.K_d]) - int(keys[pygame.K_a])
+        self.dir.y = int(keys[pygame.K_s]) - int(keys[pygame.K_w])
         self.dir = self.dir.normalize() if self.dir else self.dir
 
     def move(self,dt):
