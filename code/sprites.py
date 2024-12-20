@@ -30,7 +30,7 @@ class Gun(pygame.sprite.Sprite):
     def get_direction(self):
         mouse_pos = pygame.Vector2(pygame.mouse.get_pos())
         player_pos = pygame.Vector2(WINDOW_WIDTH /2 , WINDOW_HIEGHT / 2)
-        self.player_dir = (mouse_pos - player_pos).normalize()
+        self.player_dir = (mouse_pos - player_pos).normalize() if mouse_pos != 0 else 0
 
     def gun_rotate(self):
         angle = degrees(atan2(self.player_dir.x,self.player_dir.y)) - 90
@@ -74,12 +74,15 @@ class Enemy(pygame.sprite.Sprite):
         self.hitbox_rect = self.rect.inflate(-20,-40)
         self.collision_sprites = collision_sprites
         self.dir = pygame.Vector2()
-        self.speed = 350
+        self.speed = 250
+
+        self.death_time = 0
+        self.death_duration = 400
 
     def move(self,dt):
         player_pos = pygame.Vector2(self.player.rect.center)
         enemy_pos = pygame.Vector2(self.rect.center)
-        self.dir = (player_pos - enemy_pos).normalize()
+        self.dir = (player_pos - enemy_pos).normalize() if player_pos != 0 else 0
 
         self.hitbox_rect.centerx += self.dir.x * self.speed * dt
         self.collisions('horizontal')
@@ -101,6 +104,19 @@ class Enemy(pygame.sprite.Sprite):
                     if self.dir.y > 0: self.hitbox_rect.bottom = sprite.rect.top
                     if self.dir.y < 0: self.hitbox_rect.top = sprite.rect.bottom
 
+    def destroy(self):
+        self.death_time = pygame.time.get_ticks()
+        surf = pygame.mask.from_surface(self.frames[0]).to_surface()
+        surf.set_colorkey('black')
+        self.image = surf
+    
+    def death_timer(self):
+        if pygame.time.get_ticks() - self.death_time >= self.death_duration:
+            self.kill()
+
     def update(self, dt):
-        self.move(dt)
-        self.animate(dt)
+        if self.death_time == 0:
+            self.move(dt)   
+            self.animate(dt)    
+        else:
+            self.death_timer()
